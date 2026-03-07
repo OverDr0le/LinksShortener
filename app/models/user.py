@@ -14,7 +14,7 @@ class User(Base):
     password: Mapped[str] = mapped_column(String, nullable = False)
     created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
     
-    links = relationship("Link", back_populates="user")
+    links: Mapped[list["Link"]] = relationship(back_populates="user", cascade="all, delete-orphan")
 
     def __repr__(self):
         return f"<User(id={self.id}, email={self.email}, created_at={self.created_at})>"

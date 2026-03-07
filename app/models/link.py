@@ -53,7 +53,7 @@ class Link(Base):
         nullable=True
     )
 
-    user = relationship("User", back_populates="links")
+    user:Mapped["User"] = relationship(back_populates="links")
 
     def __repr__(self):
         return f"<Link(id={self.id}, original_url={self.original_url}, short_url={self.short_url}, created_at={self.created_at})>"
