@@ -1,6 +1,8 @@
-from typing import Optional
+from typing import AsyncGenerator, Optional
+from fastapi import Depends
 
-from sqlalchemy import select, update, delete
+from app.database import get_session
+from sqlalchemy import select, update
 from sqlalchemy.ext.asyncio import AsyncSession
 from uuid import UUID
 from app.models.link import Link
@@ -61,3 +63,6 @@ class LinkRepository:
     async def short_url_exists(self, short_url: str) -> bool:
         result = await self.db.execute(select(Link).where(Link.short_url == short_url))
         return result.scalar_one_or_none() is not None
+    
+async def get_link_repository(db:AsyncSession = Depends(get_session)) -> AsyncGenerator[LinkRepository, None]:
+    yield LinkRepository(db)
