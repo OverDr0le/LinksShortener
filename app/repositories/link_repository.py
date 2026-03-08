@@ -52,17 +52,11 @@ class LinkRepository:
         )
         await self.db.commit()
 
-    async def get_link_stats(self, link: Link) -> Optional[Link]:
-        result = await self.db.execute(select(Link).where(Link.short_url == link.short_url))
-        return result.scalar_one_or_none()
 
     async def delete(self, link: Link) -> None:
         await self.db.delete(link)
         await self.db.commit()
 
-    async def short_url_exists(self, short_url: str) -> bool:
-        result = await self.db.execute(select(Link).where(Link.short_url == short_url))
-        return result.scalar_one_or_none() is not None
     
 async def get_link_repository(db:AsyncSession = Depends(get_session)) -> AsyncGenerator[LinkRepository, None]:
     yield LinkRepository(db)

@@ -20,6 +20,7 @@ class LinkCreate(BaseModel):
     
 class LinkResponse(BaseModel):
     id: UUID
+    user_id: Optional[UUID]
     original_url: HttpUrl
     short_url: str
     created_at: datetime
@@ -29,6 +30,7 @@ class LinkResponse(BaseModel):
 
 class LinkStats(BaseModel):
     id: UUID
+    user_id: Optional[UUID]
     original_url: HttpUrl
     short_url: str
     created_at: datetime = Field(
