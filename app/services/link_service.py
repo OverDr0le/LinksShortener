@@ -91,7 +91,6 @@ class LinkService:
 
     async def update_link(
         self,
-        link: Link,
         short_url: str,
         link_data: LinkUpdate,
         current_user_id: UUID
