@@ -1,10 +1,10 @@
-from pydantic import BaseModel, EmailStr, Field, field_validator
+from pydantic import Field, field_validator
 from uuid import UUID
+from fastapi_users import schemas
 from datetime import datetime
 
 
-class UserCreate(BaseModel):
-    email: EmailStr
+class UserCreate(schemas.BaseUserCreate):
     password: str = Field(
         ...,
         min_length =8,
@@ -26,14 +26,22 @@ class UserCreate(BaseModel):
             raise ValueError('Пароль должен содержать цифру')
         return v
 
-
-class UserResponse(BaseModel):
+class UserRead(schemas.BaseUser[UUID]):
     """
-    Модель ответа с данными пользователя (без пароля)
+    Модель ответа с данными пользователя
     """
-    id: UUID
-    email: EmailStr
     created_at: datetime
+
+
+class UserUpdate(schemas.BaseUserUpdate):
+    """
+    Обновление пользователя
+    """
+    password: str | None = Field(
+        None,
+        min_length=8,
+        max_length=50
+    )
 
 
     
