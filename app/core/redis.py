@@ -2,7 +2,7 @@ import redis.asyncio as redis
 from typing import AsyncGenerator
 
 redis_client = redis.Redis(
-    host="localhost",
+    host="redis",
     port=6379,
     decode_responses=True
 )
