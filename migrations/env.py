@@ -7,8 +7,6 @@ from alembic import context
 
 from app.config import DB_USER, DB_NAME, DB_PASS, DB_PORT, DB_HOST
 from app.database import Base
-from app.models.user import User
-from app.models.link import Link
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
