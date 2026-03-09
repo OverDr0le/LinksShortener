@@ -5,12 +5,12 @@ from uuid import UUID
 
 from app.database import async_session_maker
 from app.repositories.link_repository import LinkRepository
-
+from app.config import REDIS_URL
 
 celery_app = Celery(
     "tasks",
-    broker="redis://redis:6379/0",
-    backend="redis://redis:6379/1",
+    broker=f"{REDIS_URL}/0",
+    backend=f"{REDIS_URL}/1",
 )
 
 celery_app.conf.update(
