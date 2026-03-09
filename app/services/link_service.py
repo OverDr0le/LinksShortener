@@ -1,7 +1,6 @@
 import secrets
 import string
-import json
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import AsyncGenerator
 from uuid import UUID
 
@@ -27,6 +26,24 @@ class LinkService:
         Генерация случайного короткого кода
         """
         return ''.join(secrets.choice(string.ascii_letters + string.digits) for _ in range(length))
+
+
+
+    def _normalize_expires_at(self, dt: datetime | None) -> datetime | None:
+        if not dt:
+            return None
+
+        # если пришёл naive datetime (например из формы)
+        if dt.tzinfo is None:
+            dt = dt.replace(tzinfo=timezone.utc)
+
+        # переводим в UTC
+        dt = dt.astimezone(timezone.utc)
+
+        # обрезаем секунды
+        dt = dt.replace(second=0, microsecond=0)
+
+        return dt
 
     def _cache_key(self, short_url:str):
         return f"short_url:{short_url}"
@@ -55,11 +72,13 @@ class LinkService:
             else:
                 raise RuntimeError("Не удалось сгенерировать уникальный короткий код, попробуйте снова.")
             
+        normalized_expires = self._normalize_expires_at(link_data.expires_at)
+
         link = Link(
-            original_url=link_data.original_url,
+            original_url=str(link_data.original_url),
             short_url=short_url,
             user_id=user_id,
-            expires_at=link_data.expires_at
+            expires_at=normalized_expires
         )
         
         link = await self.repo.create(link)
@@ -122,7 +141,8 @@ class LinkService:
 
 
         if link_data.expires_at:
-            link.expires_at = link_data.expires_at
+            normalized = self._normalize_expires_at(link_data.expires_at)
+            link.expires_at = normalized
 
             delete_link_task.apply_async(
                 args=[str(link.id)],
@@ -154,10 +174,13 @@ class LinkService:
         await self.repo.delete(link)
         await self.redis.delete(self._cache_key(short_url))
 
-    async def increment_click(self, link: Link) -> None:
+    async def increment_click(self, short_url: str) -> None:
         """
         Обновление статистики переходов по ссылке
         """
+        link = await self.repo.get_by_short_url(short_url)
+        if not link:
+            raise ValueError("Ссылка не найдена.")
         link.click_count += 1
         link.last_accessed_at = datetime.utcnow()
         await self.repo.update(link)
@@ -169,15 +192,7 @@ class LinkService:
         link = await self.repo.get_by_short_url(short_code)
         if not link:
             raise ValueError("Ссылка не найдена.")
-        return LinkStats(
-            id=link.id,
-            original_url=link.original_url,
-            short_url=link.short_url,
-            created_at=link.created_at,
-            expires_at=link.expires_at,
-            click_count=link.click_count,
-            last_accessed_at=link.last_accessed_at
-        )
+        return LinkStats.from_orm(link)
     
     async def get_by_original_url(self, original_url: str) -> Link | None:
         """

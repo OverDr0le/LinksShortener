@@ -32,13 +32,14 @@ class LinkRepository:
     async def update(self, link: Link) -> Link:
         await self.db.execute(
             update(Link)
-            .where(Link.short_url == link.short_url)
+            .where(Link.id == link.id)
             .values(
                 short_url=link.short_url,
                 expires_at=link.expires_at
             )
         )
         await self.db.commit()
+        await self.db.refresh(link)
         return link
     
     async def increment_click_count(self, link: Link) -> None:
