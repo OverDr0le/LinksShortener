@@ -209,6 +209,7 @@ curl -X POST "http://localhost:8000/auth/jwt/login" \
    DB_NAME=links_shortener
    SECRET=your_secret_key
    REDIS_PORT=6379
+   REDIS_URL = redis://redis:REDIS_PORT
    ```
 3. **Запустите docker-compose контейнер**
     В контейнере уже содержится всё необходимое для запуска приложения, включая PostgreSQL и Redis. Просто выполните команду:
