@@ -219,6 +219,7 @@ curl -X POST "http://localhost:8000/auth/jwt/login" \
 
 Документация API: http://localhost:8000/docs
 
+## Сервис deployed by Render: https://linksshortener.onrender.com/docs
 
 ## Описание базы данных
 
