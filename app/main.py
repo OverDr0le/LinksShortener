@@ -6,6 +6,7 @@ import redis.asyncio as aioredis
 from app.api_routers.links import router as links_router
 from app.auth.backend import auth_backend
 from app.auth.user import fastapi_users
+from app.schemas.user import UserRead, UserCreate, UserUpdate
 
 import uvicorn
 
@@ -15,7 +16,7 @@ app.include_router(links_router)
 
 @app.on_event("startup")
 async def startup_redis():
-    redis = aioredis.from_url("redis://localhost:6379")
+    redis = aioredis.from_url("redis://redis:6379")
     FastAPICache.init(RedisBackend(redis), prefix="fastapi-cache")
 
 
@@ -28,14 +29,14 @@ app.include_router(
 
 
 app.include_router(
-    fastapi_users.get_register_router(),
+    fastapi_users.get_register_router(UserRead, UserCreate),
     prefix="/auth",
     tags=["auth"]
 )
 
 
 app.include_router(
-    fastapi_users.get_users_router(),
+    fastapi_users.get_users_router(UserRead, UserUpdate),
     prefix="/users",
     tags=["users"]
 )
