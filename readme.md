@@ -182,6 +182,73 @@ curl -X POST "http://localhost:8000/auth/jwt/login" \
   -d "username=user@example.com&password=securepassword"
 ```
 
+## Запуск тестов
+
+Тесты используют in-memory SQLite и моки Redis — никакие внешние сервисы не нужны.
+
+### Установка зависимостей
+
+```bash
+pip install -r requirements-test.txt
+```
+
+### Запуск всех тестов
+
+```bash
+python -m pytest
+```
+
+### Запуск отдельных групп
+
+```bash
+# Только юнит-тесты
+python -m pytest tests/unit/
+
+# Только функциональные тесты
+python -m pytest tests/functional/
+
+# Один конкретный файл
+python -m pytest tests/functional/test_search.py
+
+# Один конкретный тест
+python -m pytest tests/functional/test_search.py::TestSearchByOriginalUrl::test_search_returns_200_for_existing_url
+```
+
+### Полезные флаги
+
+```bash
+# Подробный вывод с именами тестов
+python -m pytest -v
+
+# Остановиться на первом падении
+python -m pytest -x
+
+# Показать покрытие кода
+python -m pytest --cov=app --cov-report=term-missing
+```
+
+### Структура тестов
+
+```
+tests/
+├── conftest.py              # Общие фикстуры: БД, Redis-мок, тестовые объекты
+├── unit/                    # Юнит-тесты (без I/O, чистая логика)
+│   ├── test_link_service_logic.py
+│   └── test_repository.py
+└── functional/              # Функциональные тесты (HTTP через TestClient)
+    ├── conftest.py          # Фикстуры клиентов: authenticated_client, anon_client, other_client
+    ├── test_create_link.py
+    ├── test_delete_link.py
+    ├── test_full_crud_flow.py
+    ├── test_redirect.py
+    ├── test_search.py
+    ├── test_stats.py
+    └── test_update_link.py
+```
+
+### HTML отчёт
+- Отчёт доступен в htmlcov/index.html
+
 ## Инструкция по запуску при помощи Docker Compose
 
 ### Предварительные требования
