@@ -247,7 +247,7 @@ tests/
 ```
 
 ### HTML отчёт
-- Отчёт доступен в htmlcov/index.html
+[Открыть отчёт](https://overdr0le.github.io/LinksShortener/index.html)
 
 ## Инструкция по запуску при помощи Docker Compose
 
